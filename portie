@@ -1,0 +1,58 @@
+#!/bin/sh
+
+preview() {
+        cat <<EOF
+Origin: $1
+Package: $5
+Maintainer: $3
+WWW: $4
+
+EOF
+        cat "$2" # long description
+}
+
+fzf_command() {
+        local ports_dir indexfile awk_script THE_SCRIPT header B N
+        ports_dir="${PORTSDIR:-/usr/ports}"
+        indexfile=`make -C "$ports_dir" -VINDEXFILE`
+        THE_SCRIPT="`realpath $0`"
+        parse_index_awk='
+                BEGIN {
+                        OFS=": "
+                }
+                {
+                        n = split($2, path_segments, "/")
+                        origin=path_segments[n-1] "/" path_segments[n]
+                        print origin,$5,$6,$10,$1,$2,$4
+                }'
+        BOLD=`tput md`
+        NORM=`tput me`
+        header=$(
+                echo "<tab> info | alt+[m]akefile [p]kg-plist [d]istinfo [a]ll-depends-list show[c]onfig" \
+                        | sed "s/\([[<]\)/\\1${BOLD}/g; s/\([]>]\)/${NORM}\1/g"
+                )
+
+        awk  -F '|' "$parse_index_awk" "$ports_dir/$indexfile" | \
+                fzf -d ': ' \
+                        --with-nth=1,7.. \
+                        --preview "$THE_SCRIPT preview {1} {2} {3} {4} {5}" \
+                        --bind tab:toggle-preview \
+                        --bind "alt-p:execute($PAGER {6}/pkg-plist)" \
+                        --bind "alt-m:execute($PAGER {6}/Makefile)" \
+                        --bind "alt-d:execute($PAGER {6}/distinfo)" \
+                        --bind "alt-a:execute($THE_SCRIPT make {6} all-depends-list)" \
+                        --bind "alt-c:execute($THE_SCRIPT make {6} showconfig)" \
+                        --preview-window=right:70%:hidden:wrap \
+                        --tiebreak=begin \
+                        --header "$header" \
+                        "$@" # pass through fzf options
+}
+
+case "$1" in
+        make)
+                portpath="$2"
+                target="$3"
+                make -C "$portpath" "$target" | $PAGER ;;
+        preview)  "$@";;
+        *) fzf_command "$@"
+esac

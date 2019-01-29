@@ -1,0 +1,51 @@
+= portie
+
+portie is a simple wrapper around https://github.com/junegunn/fzf[fzf] which allows you
+to search ports, show port information, and show content of port files.
+
+== Demo
+
+image::https://media.giphy.com/media/8YNiuq30xAQunrPY2T/giphy.gif["portie demo",align="center"]
+
+
+== Requirements
+
+- fzf
++
+Install fzf package/link:https://www.freshports.org/textproc/fzf/[port] or place the
+`fzf` executable somewhere on your `PATH`.
+
+== Installation
+
+- Download the https://raw.githubusercontent.com/ALPHA-60/portie/master/portie[script] and make it executable with `chmod a+x portie`.
+
+== Usage
+
+After running `portie`, you can search for ports by their
+origin (e.g. `textproc/fzf`) and short description.
+
+
+=== Command line arguments
+
+All the arguments will be passed to fzf:
+
+ portie --color=hl+:1 --bind=alt-i:"execute(sudo synth install {1})"
+
+=== Keyboard shortcuts
+
+|===
+| Shortcut |Function
+
+|`Tab`   | Toggle window showing additional port info
+
+|`Alt+m` | Show port's `Makefile`
+
+|`Alt+p` | Show port's `pkg-plist` file
+
+|`Alt+d` | Show port's `distinfo` file
+
+|`Alt+a` | Run `make all-depends-list` to show port's dependencies
+
+|`Alt+c` | Run `make showconfig` to show port's configuration
+|===
+
