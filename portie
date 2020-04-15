@@ -12,7 +12,8 @@ EOF
 }
 
 fzf_command() {
-        local ports_dir indexfile awk_script THE_SCRIPT header B N
+        local ports_dir indexfile awk_script THE_SCRIPT header BOLD NORM viewer
+        viewer="${PAGER:-/usr/bin/less -c}"
         ports_dir="${PORTSDIR:-/usr/ports}"
         indexfile=`make -C "$ports_dir" -VINDEXFILE`
         THE_SCRIPT="`realpath $0`"
@@ -28,7 +29,7 @@ fzf_command() {
         BOLD=`tput md`
         NORM=`tput me`
         header=$(
-                echo "<tab> info | alt+[m]akefile [p]kg-plist [d]istinfo [a]ll-depends-list show[c]onfig" \
+                echo "<tab> info | alt+[m]akefile [p]kg-plist [d]istinfo [b]uild-depends-list show[c]onfig" \
                         | sed "s/\([[<]\)/\\1${BOLD}/g; s/\([]>]\)/${NORM}\1/g"
                 )
 
@@ -37,15 +38,17 @@ fzf_command() {
                         --with-nth=1,7.. \
                         --preview "$THE_SCRIPT preview {1} {2} {3} {4} {5}" \
                         --bind tab:toggle-preview \
-                        --bind "alt-p:execute($PAGER {6}/pkg-plist)" \
-                        --bind "alt-m:execute($PAGER {6}/Makefile)" \
-                        --bind "alt-d:execute($PAGER {6}/distinfo)" \
-                        --bind "alt-a:execute($THE_SCRIPT make {6} all-depends-list)" \
+                        --bind "alt-p:execute($viewer {6}/pkg-plist)" \
+                        --bind "alt-m:execute($viewer {6}/Makefile)" \
+                        --bind "alt-d:execute($viewer {6}/distinfo)" \
+                        --bind "alt-b:execute($THE_SCRIPT make {6} build-depends-list)" \
                         --bind "alt-c:execute($THE_SCRIPT make {6} showconfig)" \
+                        --bind "enter:abort" \
                         --preview-window=right:70%:hidden:wrap \
                         --tiebreak=begin \
                         --header "$header" \
-                        "$@" # pass through fzf options
+                        "$@"  || true
+                        # ^ pass through fzf options and eat "abort" error code
 }
 
 case "$1" in

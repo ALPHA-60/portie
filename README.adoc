@@ -24,12 +24,10 @@ Install fzf package/link:https://www.freshports.org/textproc/fzf/[port] or place
 After running `portie`, you can search for ports by their
 origin (e.g. `textproc/fzf`) and short description.
 
+NOTE: Portie will honor the `PAGER` environment variable. If you use `less`,
+its `-c` option for clearing the screen from top to bottom will give you
+better experience: `PAGER='less -c' portie`
 
-=== Command line arguments
-
-All the arguments will be passed to fzf:
-
- portie --color=hl+:1 --bind=alt-i:"execute(sudo synth install {1})"
 
 === Keyboard shortcuts
 
@@ -44,8 +42,30 @@ All the arguments will be passed to fzf:
 
 |`Alt+d` | Show port's `distinfo` file
 
-|`Alt+a` | Run `make all-depends-list` to show port's dependencies
+|`Alt+b` | Run `make build-depends-list` to show port's build dependencies
 
 |`Alt+c` | Run `make showconfig` to show port's configuration
 |===
 
+
+=== Command line arguments
+
+All arguments will be passed to fzf:
+
+ portie --color=hl+:1 --bind=alt-i:"execute(doas synth install {1})"
+
+You can use this for running custom commands. The numbers (such as "\{1}") denote:
+
+- \{1} - "origin", e.g. `textproc/fzf`
+- \{2} - `pkg-descr` file location
+- \{3} - maintainer
+- \{4} - project's web address
+- \{5} - package name, e.g. `fzf-0.18.0`
+- \{6} - port directory
+- \{7} - short description
+
+=== Troubleshooting
+
+If the list of ports is empty when you run portie, you might be missing the
+port INDEX file. Go to your ports directory (`/usr/ports`) and run `make
+fetchindex` or `make index`.
