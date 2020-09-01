@@ -5,7 +5,7 @@ to search ports, show port information, and show content of port files.
 
 == Demo
 
-image::https://media.giphy.com/media/8YNiuq30xAQunrPY2T/giphy.gif["portie demo",align="center"]
+image::https://github.com/ALPHA-60/portie/raw/master/images/portie_demo.gif["portie demo",align="center"]
 
 
 == Requirements
